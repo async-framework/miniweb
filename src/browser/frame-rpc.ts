@@ -26,6 +26,22 @@ export interface FrameRpcResponse {
   };
 }
 
+export interface FrameRpcSerializedRequest {
+  url: string;
+  method: string;
+  headers: Array<[string, string]>;
+  body?: string;
+  bodyEncoding?: 'base64';
+}
+
+export interface FrameRpcSerializedResponse {
+  status: number;
+  statusText: string;
+  headers: Array<[string, string]>;
+  body?: string;
+  bodyEncoding?: 'base64';
+}
+
 export function createFrameRpcClient(options: {
   targetWindow: Window;
   targetOrigin?: string;
@@ -144,6 +160,52 @@ export function createFrameRpcServer(options: {
   };
 }
 
+export async function serializeFrameRequest(request: Request): Promise<FrameRpcSerializedRequest> {
+  const serialized: FrameRpcSerializedRequest = {
+    url: request.url,
+    method: request.method,
+    headers: Array.from(request.headers.entries())
+  };
+  if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
+    serialized.body = bytesToBase64(new Uint8Array(await request.arrayBuffer()));
+    serialized.bodyEncoding = 'base64';
+  }
+  return serialized;
+}
+
+export function deserializeFrameRequest(serialized: FrameRpcSerializedRequest): Request {
+  const init: RequestInit & { duplex?: 'half' } = {
+    method: serialized.method,
+    headers: serialized.headers
+  };
+  if (serialized.body) {
+    init.body = base64ToArrayBuffer(serialized.body);
+    init.duplex = 'half';
+  }
+  return new Request(serialized.url, init);
+}
+
+export async function serializeFrameResponse(response: Response): Promise<FrameRpcSerializedResponse> {
+  const serialized: FrameRpcSerializedResponse = {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Array.from(response.headers.entries())
+  };
+  if (response.body) {
+    serialized.body = bytesToBase64(new Uint8Array(await response.arrayBuffer()));
+    serialized.bodyEncoding = 'base64';
+  }
+  return serialized;
+}
+
+export function deserializeFrameResponse(serialized: FrameRpcSerializedResponse): Response {
+  return new Response(serialized.body ? base64ToArrayBuffer(serialized.body) : null, {
+    status: serialized.status,
+    statusText: serialized.statusText,
+    headers: serialized.headers
+  });
+}
+
 function isFrameRpcRequest(value: unknown): value is FrameRpcRequest {
   return isRecord(value)
     && value.type === 'miniweb:request'
@@ -159,4 +221,26 @@ function isFrameRpcResponse(value: unknown): value is FrameRpcResponse {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+}
+
+function base64ToBytes(value: string): Uint8Array {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
+
+function base64ToArrayBuffer(value: string): ArrayBuffer {
+  const bytes = base64ToBytes(value);
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }

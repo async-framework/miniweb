@@ -36,7 +36,7 @@ describe('edge cache', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -87,7 +87,7 @@ describe('edge cache', () => {
     };
     const web = await createMiniWeb({
       origin: 'http://localhost:3000',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

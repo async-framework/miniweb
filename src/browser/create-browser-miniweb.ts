@@ -19,15 +19,17 @@ export type BrowserMiniWeb = Omit<MiniWeb, 'frontend' | 'navigate' | 'reload'> &
   reload(): Promise<Response>;
 };
 
+const interceptedFrameDocuments = new WeakSet<Document>();
+
 export async function createBrowserMiniWeb(config: MiniWebConfig): Promise<BrowserMiniWeb> {
-  if (config.layers.frontend.kind !== 'browser-frame') {
+  if (config.pipeline.frontend.kind !== 'browser-frame') {
     throw new Error('createBrowserMiniWeb requires frontend.kind = "browser-frame"');
   }
 
   const baseWeb = await createMiniWeb(config);
   const frontend = createBrowserFrameFrontend(baseWeb, {
-    frame: config.layers.frontend.frame,
-    streaming: config.layers.frontend.streaming ?? 'buffer',
+    frame: config.pipeline.frontend.frame,
+    streaming: config.pipeline.frontend.streaming ?? 'buffer',
     syncRealUrl: config.ui?.syncRealUrl ?? false,
     realUrlBasePath: config.ui?.realUrlBasePath ?? ''
   });
@@ -63,10 +65,17 @@ function createBrowserFrameFrontend(
       // TODO: support document-write and message-chunks streaming modes.
     }
 
+    const installInterceptors = (): void => {
+      installFrameInterceptors(web, options.frame, render);
+    };
+    options.frame.addEventListener('load', installInterceptors, {
+      once: true
+    });
     options.frame.srcdoc = await response.text();
     syncRealUrl(web, options);
+    installInterceptors();
     setTimeout(() => {
-      installFrameInterceptors(web, options.frame, render);
+      installInterceptors();
     }, 0);
   }
 
@@ -100,6 +109,10 @@ function installFrameInterceptors(
   if (!document) {
     return;
   }
+  if (interceptedFrameDocuments.has(document)) {
+    return;
+  }
+  interceptedFrameDocuments.add(document);
 
   document.addEventListener('click', (event) => {
     const target = event.target;
@@ -143,11 +156,16 @@ function installFrameInterceptors(
 }
 
 function isDomElement(value: EventTarget | null): value is Element {
-  return value instanceof Element;
+  return typeof value === 'object'
+    && value !== null
+    && 'nodeType' in value
+    && value.nodeType === 1
+    && 'closest' in value
+    && typeof value.closest === 'function';
 }
 
 function isFormElement(value: EventTarget | null): value is HTMLFormElement {
-  return value instanceof HTMLFormElement;
+  return isDomElement(value) && value.tagName.toLowerCase() === 'form';
 }
 
 function syncRealUrl(

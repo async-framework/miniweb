@@ -12,7 +12,7 @@ describe('miniweb pipeline', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -51,7 +51,7 @@ describe('miniweb pipeline', () => {
   it('short-circuits blocked cross-origin requests with 502', async () => {
     const web = await createMiniWeb({
       origin: 'http://localhost:3000',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -85,7 +85,7 @@ describe('miniweb pipeline', () => {
           throw new Error('bad origin');
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

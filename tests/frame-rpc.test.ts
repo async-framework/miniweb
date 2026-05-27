@@ -3,6 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   createFrameRpcClient,
   createFrameRpcServer,
+  deserializeFrameRequest,
+  deserializeFrameResponse,
+  serializeFrameRequest,
+  serializeFrameResponse,
   type FrameRpcRequest,
   type FrameRpcResponse
 } from '../src/browser/frame-rpc.ts';
@@ -121,6 +125,39 @@ describe('frame rpc', () => {
 
     await expect(destroyed).rejects.toThrow('MiniWeb frame RPC client destroyed');
     timeoutClient.destroy();
+  });
+
+  it('serializes requests and responses with buffered bodies', async () => {
+    const request = new Request('https://api.local/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'text/plain'
+      },
+      body: 'hello'
+    });
+
+    const serializedRequest = await serializeFrameRequest(request);
+    const deserializedRequest = deserializeFrameRequest(serializedRequest);
+
+    expect(deserializedRequest.url).toBe('https://api.local/messages');
+    expect(deserializedRequest.method).toBe('POST');
+    expect(deserializedRequest.headers.get('content-type')).toBe('text/plain');
+    await expect(deserializedRequest.text()).resolves.toBe('hello');
+
+    const response = new Response('world', {
+      status: 201,
+      statusText: 'Created',
+      headers: {
+        'content-type': 'text/plain'
+      }
+    });
+    const serializedResponse = await serializeFrameResponse(response);
+    const deserializedResponse = deserializeFrameResponse(serializedResponse);
+
+    expect(deserializedResponse.status).toBe(201);
+    expect(deserializedResponse.statusText).toBe('Created');
+    expect(deserializedResponse.headers.get('content-type')).toBe('text/plain');
+    await expect(deserializedResponse.text()).resolves.toBe('world');
   });
 });
 

@@ -17,7 +17,7 @@ describe('miniweb reset', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

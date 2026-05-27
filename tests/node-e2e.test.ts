@@ -8,7 +8,7 @@ describe('node miniweb e2e', () => {
       origin: 'http://localhost:3000',
       files: helloApp.files,
       app: helloApp.app,
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'node-dom'
         },
@@ -76,7 +76,7 @@ describe('node miniweb e2e', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'node-dom'
         },

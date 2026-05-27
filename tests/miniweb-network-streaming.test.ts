@@ -25,7 +25,7 @@ describe('miniweb network streaming', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -43,7 +43,7 @@ describe('miniweb network streaming', () => {
     const web = await createMiniWeb({
       origin: 'https://web.local',
       network,
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

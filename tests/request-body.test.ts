@@ -59,7 +59,7 @@ describe('request body preservation', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -101,7 +101,7 @@ describe('request body preservation', () => {
   it('preserves POST bodies through backend HTTP proxy', async () => {
     const web = await createMiniWeb({
       origin: 'http://localhost:3000',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -144,7 +144,7 @@ describe('request body preservation', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -159,7 +159,7 @@ describe('request body preservation', () => {
     const web = await createMiniWeb({
       origin: 'https://web.local',
       network,
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

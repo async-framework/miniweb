@@ -27,7 +27,7 @@ describe('edge transforms', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -68,7 +68,7 @@ describe('edge transforms', () => {
           return new Response(new URL(request.url).pathname);
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -99,7 +99,7 @@ describe('edge transforms', () => {
       files: {
         '/public/assets/app.js': 'console.log("miniweb");'
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -132,7 +132,7 @@ describe('edge transforms', () => {
   it('serves edge mock routes', async () => {
     const web = await createMiniWeb({
       origin: 'http://localhost:3000',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

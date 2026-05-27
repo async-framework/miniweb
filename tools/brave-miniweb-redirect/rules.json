@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "regexSubstitution": "http://127.0.0.1:5178\\1"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https://patrickjs-macbook-pro\\.lynx-in\\.ts\\.net(/.*)$",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  }
+]

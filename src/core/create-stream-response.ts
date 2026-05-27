@@ -41,30 +41,66 @@ export function createStreamFromAsyncIterable<T extends Uint8Array | string>(
     firstChunkDelayMs?: number;
   } = {}
 ): ReadableStream<T> {
+  const iterator = toAsyncIterator(iterable);
+  let index = 0;
+  let cancelled = false;
   return new ReadableStream<T>({
-    async start(controller) {
-      let index = 0;
-      for await (const chunk of toAsyncIterable(iterable)) {
-        const delayMs = index === 0
-          ? options.firstChunkDelayMs ?? 0
-          : options.delayMs ?? 0;
-        if (delayMs > 0) {
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
-        }
-        controller.enqueue(chunk);
-        index += 1;
+    async pull(controller) {
+      if (cancelled) {
+        return;
       }
-      controller.close();
+      const delayMs = index === 0
+        ? options.firstChunkDelayMs ?? 0
+        : options.delayMs ?? 0;
+      if (delayMs > 0) {
+        await wait(delayMs);
+      }
+      if (cancelled) {
+        return;
+      }
+      const result = await iterator.next();
+      if (cancelled) {
+        return;
+      }
+      if (result.done) {
+        controller.close();
+        return;
+      }
+      controller.enqueue(result.value);
+      index += 1;
+    },
+    async cancel() {
+      cancelled = true;
+      await iterator.return?.();
     }
   });
 }
 
-async function* toAsyncIterable<T>(
+function toAsyncIterator<T>(
   iterable: AsyncIterable<T> | Iterable<T>
-): AsyncIterable<T> {
+): AsyncIterator<T> {
   if (Symbol.asyncIterator in iterable) {
-    yield* iterable;
-    return;
+    return iterable[Symbol.asyncIterator]();
   }
-  yield* iterable;
+  const iterator = iterable[Symbol.iterator]();
+  return {
+    async next() {
+      return iterator.next();
+    },
+    async return() {
+      if (typeof iterator.return === 'function') {
+        return iterator.return();
+      }
+      return {
+        done: true,
+        value: undefined as T
+      };
+    }
+  };
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

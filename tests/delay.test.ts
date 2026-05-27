@@ -14,7 +14,7 @@ describe('delay controller', () => {
           return Response.json({ ok: true });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -51,7 +51,7 @@ describe('delay controller', () => {
           return new Response('ok');
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -93,7 +93,7 @@ describe('delay controller', () => {
           return new Response('ok');
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -140,7 +140,7 @@ describe('delay controller', () => {
           });
         }
       },
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

@@ -42,7 +42,7 @@ describe('network modes', () => {
     const network = createMiniWebNetwork();
     const apiWeb = await createMiniWeb({
       origin: 'https://api.local',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -77,7 +77,7 @@ describe('network modes', () => {
     const web = await createMiniWeb({
       origin: 'https://web.local',
       network,
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -103,7 +103,7 @@ describe('network modes', () => {
   it('uses native fetch for real-fetch cross-origin requests', async () => {
     const web = await createMiniWeb({
       origin: 'http://localhost:3000',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },
@@ -129,7 +129,7 @@ describe('network modes', () => {
   it('falls back to native fetch when miniweb-network allows external fetch', async () => {
     const web = await createMiniWeb({
       origin: 'http://localhost:3000',
-      layers: {
+      pipeline: {
         frontend: {
           kind: 'headless'
         },

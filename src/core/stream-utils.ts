@@ -42,18 +42,34 @@ export function createReadableStreamFromTextChunks(
     firstChunkDelayMs?: number;
   } = {}
 ): ReadableStream<Uint8Array> {
+  let index = 0;
+  let cancelled = false;
   return new ReadableStream<Uint8Array>({
-    async start(controller) {
-      for (const [index, chunk] of chunks.entries()) {
-        const delayMs = index === 0
-          ? options.firstChunkDelayMs ?? 0
-          : options.delayMs ?? 0;
-        if (delayMs > 0) {
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
-        }
-        controller.enqueue(encoder.encode(chunk));
+    async pull(controller) {
+      if (cancelled) {
+        return;
       }
-      controller.close();
+      if (index >= chunks.length) {
+        controller.close();
+        return;
+      }
+      const delayMs = index === 0
+        ? options.firstChunkDelayMs ?? 0
+        : options.delayMs ?? 0;
+      if (delayMs > 0) {
+        await wait(delayMs);
+      }
+      if (cancelled) {
+        return;
+      }
+      controller.enqueue(encoder.encode(chunks[index]!));
+      index += 1;
+      if (index >= chunks.length) {
+        controller.close();
+      }
+    },
+    cancel() {
+      cancelled = true;
     }
   });
 }
@@ -67,4 +83,10 @@ function concat(chunks: Uint8Array[]): Uint8Array {
     offset += chunk.byteLength;
   }
   return output;
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
