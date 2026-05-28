@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/async-framework/miniweb/compare/v0.1.0...v0.2.0) (2026-05-28)
+
+
+### Features
+
+* add MiniWeb simulator ([5da6fa6](https://github.com/async-framework/miniweb/commit/5da6fa62a95d0698834211cf248c2fe050c5d7e9))
+
 ## [0.1.0](https://github.com/async-framework/miniweb/releases/tag/v0.1.0) - 2026-05-28
 
 Initial public release of MiniWeb as `@async/miniweb`.

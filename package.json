@@ -1,6 +1,6 @@
 {
   "name": "@async/miniweb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "A tiny web-stack simulator for static-hosted demos and Node-side integration tests.",
   "license": "MIT",
