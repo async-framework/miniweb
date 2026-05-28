@@ -10,6 +10,7 @@ Use these pages by task:
 - [Routes And Cache](routes-and-cache.md): connect apps with promise middleware and cache behavior.
 - [Platform And Runtimes](platform-and-runtimes.md): use scoped Web APIs and choose same-realm or iframe execution.
 - [Vite Compile-Away](vite-compile-away.md): import MiniWeb platform APIs in source and swap them by dev/build target.
+- [Releasing](releasing.md): publish `@async/miniweb` to npm and GitHub Releases.
 - [Browser Shell](browser-shell.md): run the root examples directory locally or through Tailscale Serve.
 
 The short path is:

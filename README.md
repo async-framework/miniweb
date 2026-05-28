@@ -125,6 +125,7 @@ The streaming example accepts delay query params for manual testing:
 - [Routes And Cache](docs/routes-and-cache.md)
 - [Platform And Runtimes](docs/platform-and-runtimes.md)
 - [Vite Compile-Away](docs/vite-compile-away.md)
+- [Releasing](docs/releasing.md)
 - [Browser Shell](docs/browser-shell.md)
 
 ## File Map

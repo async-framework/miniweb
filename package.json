@@ -1,9 +1,17 @@
 {
   "name": "@async/miniweb",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "A tiny web-stack simulator for static-hosted demos and Node-side integration tests.",
   "license": "MIT",
+  "homepage": "https://github.com/async-framework/miniweb#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/async-framework/miniweb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/async-framework/miniweb/issues"
+  },
   "bin": {
     "miniweb": "./dist/cli.js"
   },
@@ -40,12 +48,17 @@
   "files": [
     "dist",
     "docs/*.md",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && tsc -p tsconfig.build.json",
+    "release:check": "npm run typecheck && npm test && npm run build && npm pack --dry-run",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
